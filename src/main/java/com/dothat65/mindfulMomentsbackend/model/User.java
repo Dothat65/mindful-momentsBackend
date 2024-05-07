@@ -21,7 +21,7 @@ public class User {
     /** The username of the user. */
     private String username;
     /** The password of the user. */
-    private String passwords;
+    private String password;
     /** The email of the user. */
     private String email;
     /** The first name of the user. */
@@ -32,14 +32,14 @@ public class User {
     /**
      * Constructor for the User object.
      * @param username The username of the user.
-     * @param passwords The password of the user.
+     * @param password The password of the user.
      * @param email The email of the user.
      * @param firstName The first name of the user.
      * @param lastName The last name of the user.
      */
-    public User(String username, String passwords, String email, String firstName, String lastName) {
+    public User(String username, String password, String email, String firstName, String lastName) {
         this.username = username;
-        this.passwords = passwords;
+        this.password = password;
         this.email = email;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -82,17 +82,17 @@ public class User {
      * @return The password of the user.
      */
 
-    public String getPasswords() {
-        return passwords;
+    public String getPassword() {
+        return password;
     }
 
     /**
      * Setter for the password.
-     * @param passwords The password of the user.
+     * @param password The password of the user.
      */
 
-    public void setPasswords(String passwords) {
-        this.passwords = passwords;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     /**
