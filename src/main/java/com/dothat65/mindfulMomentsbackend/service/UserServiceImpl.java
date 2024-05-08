@@ -7,13 +7,11 @@ import org.springframework.stereotype.Service;
 
 // enter business logic into the UserServiceImpl class to implement the methods defined in the UserService interface.
 @Service
-public class UserServiceImpl implements UserService {
-
-    private final UserRepository userRepository;
+public class UserServiceImpl extends UserService {
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository) {
-        this.userRepository = userRepository;
+        super(userRepository);
     }
 
     @Override

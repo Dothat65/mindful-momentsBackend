@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
  * Service class for handling business logic related to User entities.
  */
 @Service
-public class UserService {
+public abstract class UserService {
 
     private final UserRepository userRepository;
 
@@ -120,4 +120,10 @@ public class UserService {
             userRepository.save(user);
             return user; // return the updated user
         }
-    }
+
+    public abstract User authenticateUser(String username, String password);
+
+    public abstract boolean resetPassword(String email);
+
+    public abstract boolean changePassword(String username, String oldPassword, String newPassword);
+}
