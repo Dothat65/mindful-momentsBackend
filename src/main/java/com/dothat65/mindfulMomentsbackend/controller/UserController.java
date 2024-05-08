@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 /**
  * Controller class for managing user-related operations.
  */
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/users")
 public class UserController {
