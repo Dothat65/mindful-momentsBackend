@@ -6,6 +6,11 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import java.util.Date;
 
 
 /**
@@ -27,80 +32,81 @@ public class UserService {
     }
 
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
+
     /**
      * Creates a new User entity.
      *
      * @param user the User entity to be created
-     * @return the created User entity
-     * @throws IllegalArgumentException if a user with the same username or email already exists
+     * @return ResponseEntity with the created User entity and appropriate HTTP status
      */
-    public User createUser(User user) {
+    public ResponseEntity<?> createUser(User user) {
         User existingUserByUsername = userRepository.findByUsername(user.getUsername());
         User existingUserByEmail = userRepository.findByEmail(user.getEmail());
 
         if (existingUserByUsername != null) {
-            throw new IllegalArgumentException("User already exists with username: " + user.getUsername());
+            return new ResponseEntity<>("User already exists with username: " + user.getUsername(), HttpStatus.BAD_REQUEST);
         }
 
         if (existingUserByEmail != null) {
-            throw new IllegalArgumentException("User already exists with email: " + user.getEmail());
+            return new ResponseEntity<>("User already exists with email: " + user.getEmail(), HttpStatus.BAD_REQUEST);
         }
 
-        return userRepository.save(user);
+        User savedUser = userRepository.save(user);
+        return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
     }
 
     /**
      * Retrieves a User entity by username.
      *
      * @param username the username of the User entity to be retrieved
-     * @return the retrieved User entity
-     * @throws IllegalArgumentException if no user with the given username exists
+     * @return ResponseEntity with the retrieved User entity and appropriate HTTP status
      */
-    public User getUserByUsername(String username) {
+    public ResponseEntity<?> getUserByUsername(String username) {
         User user = userRepository.findByUsername(username);
         if (user == null) {
-            throw new IllegalArgumentException("User not found with username: " + username);
+            return new ResponseEntity<>("User not found with username: " + username, HttpStatus.NOT_FOUND);
         }
-        return user;
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     /**
      * Retrieves a User entity by email.
      *
      * @param email the email of the User entity to be retrieved
-     * @return the retrieved User entity
-     * @throws IllegalArgumentException if no user with the given email exists
+     * @return ResponseEntity with the retrieved User entity and appropriate HTTP status
      */
-    public User getUserByEmail(String email) {
+    public ResponseEntity<?> getUserByEmail(String email) {
         User user = userRepository.findByEmail(email);
         if (user == null) {
-            throw new IllegalArgumentException("User not found with email: " + email);
+            return new ResponseEntity<>("User not found with email: " + email, HttpStatus.NOT_FOUND);
         }
-        return user;
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     /**
      * Deletes a User entity by username.
      *
      * @param username the username of the User entity to be deleted
-     * @throws IllegalArgumentException if no user with the given username exists
+     * @return ResponseEntity with appropriate HTTP status
      */
-    public void deleteUser(String username) {
+    public ResponseEntity<?> deleteUser(String username) {
         User user = userRepository.findByUsername(username);
         if (user == null) {
-            throw new IllegalArgumentException("User not found with username: " + username);
+            return new ResponseEntity<>("User not found with username: " + username, HttpStatus.NOT_FOUND);
         }
         userRepository.delete(user);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     /**
      * Updates a User entity.
      *
      * @param user the User entity to be updated
-     * @return the updated User entity
+     * @return ResponseEntity with the updated User entity and appropriate HTTP status
      */
-    public User updateUser(User user) {
-        return userRepository.save(user);
+    public ResponseEntity<?> updateUser(User user) {
+        User updatedUser = userRepository.save(user);
+        return new ResponseEntity<>(updatedUser, HttpStatus.OK);
     }
 
     /**
@@ -108,16 +114,42 @@ public class UserService {
      *
      * @param username the username of the User entity whose password is to be reset
      * @param newPassword the new password to be set
-     * @return the updated User entity
+     * @return ResponseEntity with the updated User entity and appropriate HTTP status
      */
-
-        public User resetPassword(String username, String newPassword) {
-            User user = userRepository.findByUsername(username);
-            if (user == null) {
-                throw new IllegalArgumentException("User not found");
-            }
-            user.setPassword(newPassword);
-            userRepository.save(user);
-            return user; // return the updated user
+    public ResponseEntity<?> resetPassword(String username, String newPassword) {
+        User user = userRepository.findByUsername(username);
+        if (user == null) {
+            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
         }
+        user.setPassword(newPassword);
+        User updatedUser = userRepository.save(user);
+        return new ResponseEntity<>(updatedUser, HttpStatus.OK);
+    }
+
+    /**
+     * Logs in a user.
+     *
+     * @param username the username of the user to log in
+     * @param password the password of the user to log in
+     * @return ResponseEntity with the User entity that was logged in and appropriate HTTP status
+     */
+    public ResponseEntity<?> login(String username, String password) {
+        User user = userRepository.findByUsername(username);
+        if (user == null) {
+            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+        }
+        if (!user.getPassword().equals(password)) {
+            return new ResponseEntity<>("Incorrect password", HttpStatus.UNAUTHORIZED);
+        }
+
+        // Generate a JWT for the user
+        String token = Jwts.builder()
+                .setSubject(user.getId().toString())  // Set the subject to the user ID
+                .setExpiration(new Date(System.currentTimeMillis() + 3600000))  // Set token to expire in 1 hour
+                .signWith(SignatureAlgorithm.HS256, "0x7A1B3CF9E2D847A10FEDCBA9876543210ABCDEF0123456789ABCDEFEDCBA987")  // Sign the token with a secret key
+                .compact();
+
+        // Return the token in the response
+        return new ResponseEntity<>(token, HttpStatus.OK);
+    }
     }

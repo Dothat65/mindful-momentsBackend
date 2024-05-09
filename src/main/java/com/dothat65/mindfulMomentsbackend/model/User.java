@@ -1,11 +1,9 @@
 package com.dothat65.mindfulMomentsbackend.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import jakarta.persistence.*;
 
+import java.util.List;
 
 
 /**
@@ -18,6 +16,11 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    /** The list of journal entries for the user.*/
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<Journal> journalEntries;
     /** The username of the user. */
     private String username;
     /** The password of the user. */
@@ -150,6 +153,21 @@ public class User {
     }
 
 
+    /**
+     * Getter for the journal entries.
+     * @return The journal entries of the user.
+     */
+    public List<Journal> getJournalEntries() {
+        return journalEntries;
+    }
 
+    /**
+     * Setter for the journal entries.
+     * @param journalEntries The journal entries of the user.
+     */
+
+    public void setJournalEntries(List<Journal> journalEntries) {
+        this.journalEntries = journalEntries;
+    }
 
 }
