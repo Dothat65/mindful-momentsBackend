@@ -2,8 +2,12 @@ package com.dothat65.mindfulMomentsbackend.controller;
 import com.dothat65.mindfulMomentsbackend.model.User;
 import com.dothat65.mindfulMomentsbackend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Collections;
+import java.util.Map;
 
 /**
  * Controller class for managing user-related operations.
@@ -23,56 +27,67 @@ public class UserController {
     /**
      * Creates a new user.
      * @param user The user object to be created.
-     * @return ResponseEntity with the created user and HTTP status 200 (OK).
+     * @return ResponseEntity with the created user and appropriate HTTP status.
      */
     @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody User user) {
-        User createdUser = userService.createUser(user);
-        return ResponseEntity.ok(createdUser);
+    public ResponseEntity<?> createUser(@RequestBody User user) {
+        return userService.createUser(user);
     }
 
     /**
      * Retrieves a user by username.
      * @param username The username of the user to retrieve.
-     * @return ResponseEntity with the retrieved user and HTTP status 200 (OK).
+     * @return ResponseEntity with the retrieved user and appropriate HTTP status.
      */
     @GetMapping("/{username}")
-    public ResponseEntity<User> getUserByUsername(@PathVariable String username) {
-        User user = userService.getUserByUsername(username);
-        return ResponseEntity.ok(user);
+    public ResponseEntity<?> getUserByUsername(@PathVariable String username) {
+        return userService.getUserByUsername(username);
     }
 
     /**
      * Updates an existing user.
      * @param user The updated user object.
-     * @return ResponseEntity with the updated user and HTTP status 200 (OK).
+     * @return ResponseEntity with the updated user and appropriate HTTP status.
      */
     @PutMapping
-    public ResponseEntity<User> updateUser(@RequestBody User user) {
-        User updatedUser = userService.updateUser(user);
-        return ResponseEntity.ok(updatedUser);
+    public ResponseEntity<?> updateUser(@RequestBody User user) {
+        return userService.updateUser(user);
     }
 
     /**
      * Deletes a user by username.
      * @param username The username of the user to delete.
-     * @return ResponseEntity with HTTP status 200 (OK) upon successful deletion.
+     * @return ResponseEntity with appropriate HTTP status.
      */
     @DeleteMapping("/{username}")
-    public ResponseEntity<Void> deleteUser(@PathVariable String username) {
-        userService.deleteUser(username);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<?> deleteUser(@PathVariable String username) {
+        return userService.deleteUser(username);
     }
 
     /**
      * Resets the password for a user.
      * @param username The username of the user whose password is to be reset.
-     * @param newPassword The new password for the user.
-     * @return ResponseEntity with the updated user and HTTP status 200 (OK).
+     * @return ResponseEntity with the updated user and appropriate HTTP status.
      */
     @PutMapping("/{username}/reset-password")
-    public ResponseEntity<User> resetPassword(@PathVariable String username, @RequestBody String newPassword) {
-        User user = userService.resetPassword(username, newPassword);
-        return ResponseEntity.ok(user);
+    public ResponseEntity<?> resetPassword(@PathVariable String username, @RequestBody Map<String, String> passwordMap) {
+        return userService.resetPassword(username, passwordMap.get("newPassword"));
+    }
+
+    /**
+     * Logs in a user.
+     * @param user The user object to be logged in.
+     * @return ResponseEntity with the logged-in user and appropriate HTTP status.
+     */
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody User user) {
+        ResponseEntity<?> response = userService.login(user.getUsername(), user.getPassword());
+
+        if (response.getStatusCode() == HttpStatus.OK) {
+            String token = (String) response.getBody();
+            return new ResponseEntity<>(Collections.singletonMap("token", token), HttpStatus.OK);
+        } else {
+            return response;
+        }
     }
 }
