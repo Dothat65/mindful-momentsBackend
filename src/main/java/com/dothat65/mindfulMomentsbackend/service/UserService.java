@@ -17,7 +17,7 @@ import java.util.Date;
  * Service class for handling business logic related to User entities.
  */
 @Service
-public class UserService {
+public abstract class UserService {
 
     private final UserRepository userRepository;
 
@@ -142,6 +142,8 @@ public class UserService {
             return new ResponseEntity<>("Incorrect password", HttpStatus.UNAUTHORIZED);
         }
 
+
+
         // Generate a JWT for the user
         String token = Jwts.builder()
                 .setSubject(user.getId().toString())  // Set the subject to the user ID
@@ -153,3 +155,4 @@ public class UserService {
         return new ResponseEntity<>(token, HttpStatus.OK);
     }
     }
+
