@@ -15,4 +15,6 @@ public interface JournalRepository extends JpaRepository<Journal, Long>{
      * @return A list of journal entries associated with the user.
      */
     List<Journal> findByUser(User user);
+
+    List<Journal> findByUserIdOrderByDateDesc(Long user);
 }

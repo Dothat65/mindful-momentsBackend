@@ -13,14 +13,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 
 /**
  * Service class for handling business logic related to Journal entities.
  */
 @Service
 public class JournalService {
-
-
 
     private final JournalRepository journalRepository;
     private final UserRepository userRepository;
@@ -42,11 +43,12 @@ public class JournalService {
      * @return the created Journal entity
      */
 
-    public Journal createJournal(Journal journal, Long username){
+    public Journal createJournal(Journal journal, Long username, String mood){
         User user = userRepository.findById(username).orElseThrow(() -> new DataAccessException("User not found") {});
         System.out.println("Retrieved user: " + user);  // Log user object
 
         journal.setUser(user);
+        journal.setMood(mood);
 
         System.out.println("Saving journal: " + journal);  // Log journal object before saving
         Journal savedJournal = journalRepository.save(journal);
@@ -54,7 +56,6 @@ public class JournalService {
 
         return savedJournal;
     }
-
 
     /**
      * Deletes a Journal entity by id.
@@ -72,6 +73,6 @@ public class JournalService {
 
         journalRepository.delete(journal);
     }
-
-
 }
+
+
