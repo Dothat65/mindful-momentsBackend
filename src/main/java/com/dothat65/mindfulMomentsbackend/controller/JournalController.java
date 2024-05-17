@@ -1,6 +1,7 @@
 package com.dothat65.mindfulMomentsbackend.controller;
 import com.dothat65.mindfulMomentsbackend.model.Journal;
 import com.dothat65.mindfulMomentsbackend.service.JournalService;
+import com.dothat65.mindfulMomentsbackend.service.MoodTrendService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
@@ -39,7 +40,7 @@ public class JournalController {
      */
 
     @PostMapping
-    public Journal createJournal(@RequestBody Journal journal, @RequestHeader("Authorization") String token) {
+    public Journal createJournal(@RequestBody Journal journal, @RequestHeader("Authorization") String token, @RequestParam String mood) {
         System.out.println("Received token: " + token);
 
         if (token != null && token.startsWith("Bearer ")) {
@@ -56,7 +57,7 @@ public class JournalController {
 
         System.out.println("Received journal: " + journal);  // Log journal object
 
-        Journal createdJournal = journalService.createJournal(journal, userId);
+        Journal createdJournal = journalService.createJournal(journal, userId, mood);
         System.out.println("Created journal: " + createdJournal);  // Log created journal object
 
         return createdJournal;
@@ -82,3 +83,5 @@ public class JournalController {
         return ResponseEntity.ok().build();
     }
 }
+
+
