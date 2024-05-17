@@ -142,8 +142,6 @@ public abstract class UserService {
             return new ResponseEntity<>("Incorrect password", HttpStatus.UNAUTHORIZED);
         }
 
-
-
         // Generate a JWT for the user
         String token = Jwts.builder()
                 .setSubject(user.getId().toString())  // Set the subject to the user ID
@@ -154,5 +152,10 @@ public abstract class UserService {
         // Return the token in the response
         return new ResponseEntity<>(token, HttpStatus.OK);
     }
-    }
 
+    public abstract User authenticateUser(String username, String password);
+
+    public abstract boolean resetPassword(String email);
+
+    public abstract boolean changePassword(String username, String oldPassword, String newPassword);
+}

@@ -32,6 +32,7 @@ public class Journal {
      */
     @Column (length = 1000)
     private String content;
+    private String Mood;
 
 
     public User getUser() {
@@ -44,6 +45,12 @@ public class Journal {
 
     public String getContent() {
         return content;
+    }
+
+    public String getMood() {return Mood;}
+
+    public void setMood(String mood) {
+        this.Mood = mood;
     }
 
     public void setContent(String content) {
@@ -59,3 +66,6 @@ public class Journal {
                 '}';
     }
 }
+
+
+
